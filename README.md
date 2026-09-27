@@ -2,7 +2,9 @@
 
 [English overview](README.en.md) · n8n + Python + Ollama
 
-**这是可在本机运行的作品集项目。** 下方截图来自实际应用；文中的 `127.0.0.1` 地址只在运行本项目的电脑上有效，不是公网演示链接。
+**[在线体验：Hugging Face Space](https://huggingface.co/spaces/yesyanyan/inquiry-desk)** · [浏览器演示源码](hf-space/)
+
+在线版提供明确标注的预录案例和浏览器 AI 提取；首次运行 AI 需下载模型，记录刷新即清空。完整 n8n + Python + Ollama 流程在本机运行，下方截图来自该版本。文中的 `127.0.0.1` 地址仅在部署电脑上有效。
 
 把客户的一段消息转换成可跟进的客户记录：提取联系人、公司、需求、预算和时间，检查缺失信息，生成待人工确认的回复草稿。
 

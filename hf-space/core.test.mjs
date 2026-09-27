@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {samples,verify,parseResult,validateMessage,toCSV,normalize} from './core.mjs';
+test('complete Chinese example',()=>{const s=samples[0],r=verify(s.message,s.result,'example');assert.deepEqual(r.missing,[]);assert.equal(r.email,'lin.yue@example.com');assert.equal(r.mode,'example');});
+test('incomplete message does not invent fields',()=>{const s=samples[2],r=verify(s.message,s.result);assert.deepEqual(r.missing,['name','email','budget','timeline']);assert.match(r.draft,/请补充/);});
+test('ungrounded model output rejected',()=>{const s=samples[0],r=verify(s.message,{...s.result,name:'Fake',budget:'99999'});assert.equal(r.name,'');assert.equal(r.budget,'');assert.equal(r.warnings.length,2);});
+test('invalid and incomplete JSON fails',()=>{assert.throws(()=>parseResult('hello'));assert.throws(()=>parseResult('{"name":"Alex"}'));assert.throws(()=>parseResult('{"name":'));});
+test('JSON code fence accepted',()=>{assert.equal(parseResult('```json\n'+JSON.stringify(samples[0].result)+'\n```').name,'林悦');});
+test('multiple emails are ambiguous',()=>{const s=samples[0];assert.equal(verify(s.message+' other@example.com',s.result).email,'');});
+test('input limits',()=>{assert.throws(()=>validateMessage(''));assert.throws(()=>validateMessage('a'.repeat(1801)));assert.throws(()=>validateMessage(null));});
+test('CSV formula escaping and duplicate normalization',()=>{assert.match(toCSV([{name:'=HYPERLINK("bad")'}]),/'=HYPERLINK/);assert.equal(normalize(' a  b '),'a b');});

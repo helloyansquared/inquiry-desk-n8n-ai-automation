@@ -8,7 +8,9 @@ An AI automation portfolio project for a common small-business task: reading inq
 
 ![Actual application using a fictional inquiry](docs/demo.png)
 
-This is a working **local application**, not a hosted online service. It requires your own n8n and Ollama instances. The interface is in Chinese, with Chinese and English example inquiries. No paid AI API key is required.
+**[Try the browser demo on Hugging Face](https://huggingface.co/spaces/yesyanyan/inquiry-desk)** · [Demo source](hf-space/)
+
+The hosted companion offers clearly labeled recorded examples and on-device browser AI extraction. First use downloads model weights; records are cleared on refresh. The full n8n + Python application shown above runs locally and requires your own n8n and Ollama instances. The interface is in Chinese, with Chinese and English example inquiries. No paid AI API key is required.
 
 ## Workflow
 
