@@ -1,0 +1,41 @@
+{
+  "tested_at": "2026-09-27T22:40:01+0200",
+  "results": [
+    {
+      "case": "zh_complete",
+      "passed": true,
+      "seconds": 0.4,
+      "duplicate": true,
+      "model": "qwen3:8b",
+      "lead_id": 1
+    },
+    {
+      "case": "en_complete",
+      "passed": true,
+      "seconds": 2.2,
+      "duplicate": false,
+      "model": "qwen3-vl:2b",
+      "lead_id": 2
+    },
+    {
+      "case": "missing_fields",
+      "passed": true,
+      "seconds": 1.2,
+      "duplicate": false,
+      "model": "qwen3-vl:2b",
+      "lead_id": 3
+    },
+    {
+      "case": "duplicate_submission",
+      "passed": true
+    },
+    {
+      "case": "invalid_input",
+      "passed": true
+    },
+    {
+      "case": "csv_export",
+      "passed": true
+    }
+  ]
+}

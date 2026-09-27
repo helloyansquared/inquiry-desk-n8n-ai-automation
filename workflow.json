@@ -1,0 +1,231 @@
+{
+  "id": "portfolioInquiryDeskV1",
+  "name": "Portfolio 01 | Inquiry Desk 询盘自动整理",
+  "active": false,
+  "nodes": [
+    {
+      "id": "45b8c549-42e0-5e57-b5a3-2ddb80e5eeab",
+      "name": "Receive inquiry",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "portfolio-inquiry-desk-v1",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "webhookId": "portfolio-inquiry-desk-v1"
+    },
+    {
+      "id": "15170584-d6b6-55b6-8c6b-afd0fea3306a",
+      "name": "Validate & deduplicate",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        240,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8769/internal/prepare",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { message: $json.body.message } }}",
+        "options": {
+          "timeout": 20000
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
+    },
+    {
+      "id": "496ff9b6-df8d-542b-91b3-3ac4cc7967d9",
+      "name": "New valid inquiry?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        480,
+        0
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "needs-ai",
+              "leftValue": "={{ $json.needs_ai }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "91a30fe9-99d0-526f-878f-7d515dcad384",
+      "name": "Extract with local Qwen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        -100
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "http://ollama:11434/api/chat",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.llm_request }}",
+        "options": {
+          "timeout": 180000
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "0ac9dea3-5d1d-5e35-9f4b-51d4b5986de9",
+      "name": "Verify fields & save draft",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        -100
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8769/internal/finalize",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { prepared: $('Validate & deduplicate').item.json, ai: $json } }}",
+        "options": {
+          "timeout": 20000
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
+    },
+    {
+      "id": "2ba741ae-f95b-5b47-88fc-2e97db091674",
+      "name": "Return result",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1200,
+        0
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": "={{ $json.http_status || 200 }}"
+        }
+      }
+    },
+    {
+      "id": "a1fb64bd-af16-5c34-9df8-df10df5e2cdd",
+      "name": "About this portfolio",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -330
+      ],
+      "parameters": {
+        "content": "## Inquiry Desk · 询盘自动整理\n**n8n 编排 + 本地 Qwen + Python 校验与 SQLite**\n输入校验 → 去重 → AI 提取 → 原文核对 → 草稿与客户记录。\n回复采用校验模板；不会发送邮件。AI 异常时保存原文待人工整理。\n演示入口：http://127.0.0.1:8769\nPython 服务需运行；模型由 Python 服务配置，默认 qwen3-vl:2b。",
+        "height": 250,
+        "width": 620,
+        "color": 4
+      }
+    }
+  ],
+  "connections": {
+    "Receive inquiry": {
+      "main": [
+        [
+          {
+            "node": "Validate & deduplicate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate & deduplicate": {
+      "main": [
+        [
+          {
+            "node": "New valid inquiry?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New valid inquiry?": {
+      "main": [
+        [
+          {
+            "node": "Extract with local Qwen",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract with local Qwen": {
+      "main": [
+        [
+          {
+            "node": "Verify fields & save draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify fields & save draft": {
+      "main": [
+        [
+          {
+            "node": "Return result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "executionTimeout": 230,
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "all",
+    "timezone": "Europe/Paris"
+  },
+  "pinData": {},
+  "tags": []
+}
