@@ -2,7 +2,7 @@
 
 [English overview](README.en.md) · n8n + Python + Ollama
 
-**[在线体验：Hugging Face Space](https://huggingface.co/spaces/yesyanyan/inquiry-desk)** · [浏览器演示源码](hf-space/)
+**[在线体验：Hugging Face Space](https://huggingface.co/spaces/helloyansquared/inquiry-desk)** · [浏览器演示源码](hf-space/)
 
 在线版提供明确标注的预录案例和浏览器 AI 提取；首次运行 AI 需下载模型，记录刷新即清空。完整 n8n + Python + Ollama 流程在本机运行，下方截图来自该版本。文中的 `127.0.0.1` 地址仅在部署电脑上有效。
 
