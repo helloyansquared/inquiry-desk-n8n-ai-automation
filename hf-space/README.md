@@ -18,7 +18,7 @@ tags:
 
 # Inquiry Desk — browser demo
 
-A free static companion to the [n8n + Python portfolio](https://github.com/yesyesyanyan/inquiry-desk-n8n-ai-automation).
+A free static companion to the [n8n + Python portfolio](https://github.com/helloyansquared/inquiry-desk-n8n-ai-automation).
 
 **Two clearly separated modes:**
 
